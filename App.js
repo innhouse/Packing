@@ -23,6 +23,11 @@ export default function App() {
   const [lists, setLists] = useState(null);
   const [tripId, setTripId] = useState(null);
   const [listId, setListId] = useState(null);
+  const [slow, setSlow] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setSlow(true), 7000);
+    return () => clearTimeout(t);
+  }, []);
 
   // Apply over-the-air updates on launch instead of on the next launch.
   useEffect(() => {
@@ -66,6 +71,11 @@ export default function App() {
     body = (
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
         <Text style={{ fontSize: fonts.big, color: colors.inkSoft }}>Loading…</Text>
+        {slow && (
+          <Text style={{ fontSize: fonts.small, color: colors.inkSoft, textAlign: "center", marginTop: 12, paddingHorizontal: 30 }}>
+            Can't reach the family database yet. Check your connection; the app will carry on as soon as it gets through.
+          </Text>
+        )}
       </View>
     );
   } else {

@@ -11,8 +11,12 @@ ship them without asking for terminal work unless unavoidable.
 ## Status (2026-11-13)
 - App code written and tested **on web only** (`npx expo export --platform web`,
   then clicked through every feature in a browser). **Never yet run on a phone.**
-- `firebaseConfig.js` still has `PASTE_` placeholders, so the app runs in
-  **local mode** (data on the device only, no sync). Fill it in to switch on sync.
+- Firebase project `family-packing-ba2c3` is wired into `firebaseConfig.js`,
+  so the app is in **cloud mode**. **Sync has never been tested**: the build
+  sandbox could not reach Firestore. Before first use, confirm the Firestore
+  database exists (production mode) and **publish `firestore.rules`**
+  (`firebase deploy --only firestore:rules`); until then every read is denied
+  and the app sits on "Loading…".
 - Not yet deployed anywhere. See "First deploy" below.
 
 ## What it does
@@ -53,10 +57,10 @@ offline on the phone sync only if the app stays open until it reconnects.
   the web checklist; add it once the app runs on a phone.
 
 ## First deploy (needs Amin's sign-ins; he types passwords)
-1. Firebase: new project (not Family Rides'), Firestore in production mode,
-   paste the web config into `firebaseConfig.js`, publish `firestore.rules`
-   (`firebase deploy --only firestore:rules` after `firebase use --add`, or
-   paste into the console).
+1. Firebase (project `family-packing-ba2c3`, already in `.firebaserc`): make
+   sure the Firestore database exists, then publish the rules with
+   `firebase deploy --only firestore:rules` (or paste `firestore.rules` into
+   the console's Rules tab). Then test sync between two browsers.
 2. `npm install`, then `npx eas-cli init` (Expo account `ddduber`) to create
    the EAS project; it writes `extra.eas.projectId` into `app.json`.
 3. `npx expo install expo-updates` is already satisfied; run
