@@ -1,0 +1,27 @@
+{
+  "expo": {
+    "name": "Family Packing",
+    "slug": "family-packing",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "ca.bc.innhouse.familypacking",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "package": "ca.bc.innhouse.familypacking"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "owner": "ddduber",
+    "runtimeVersion": {
+      "policy": "sdkVersion"
+    }
+  }
+}

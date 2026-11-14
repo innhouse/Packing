@@ -1,0 +1,14 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Family-trial rules, same trade-off as Family Rides: anyone with the
+    // app's Firebase config can read and write. Fine for packing lists;
+    // tighten with Firebase Auth before any wider use.
+    match /members/{id} { allow read, write: if true; }
+    match /trips/{id} { allow read, write: if true; }
+    match /lists/{id} {
+      allow read, write: if true;
+      match /items/{itemId} { allow read, write: if true; }
+    }
+  }
+}
