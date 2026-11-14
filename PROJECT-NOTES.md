@@ -13,8 +13,8 @@ ship them without asking for terminal work unless unavoidable.
   then clicked through every feature in a browser). **Never yet run on a phone.**
 - Firebase project `family-packing-ba2c3` is wired into `firebaseConfig.js`,
   so the app is in **cloud mode**. **Sync has never been tested**: the build
-  sandbox could not reach Firestore. Before first use, confirm the Firestore
-  database exists (production mode) and **publish `firestore.rules`**
+  sandbox could not reach Firestore. Before first use, **create the Firestore
+  database** (see First deploy step 1) and **publish `firestore.rules`**
   (`firebase deploy --only firestore:rules`); until then every read is denied
   and the app sits on "Loading…".
 - Not yet deployed anywhere. See "First deploy" below.
@@ -57,8 +57,12 @@ offline on the phone sync only if the app stays open until it reconnects.
   the web checklist; add it once the app runs on a phone.
 
 ## First deploy (needs Amin's sign-ins; he types passwords)
-1. Firebase (project `family-packing-ba2c3`, already in `.firebaserc`): make
-   sure the Firestore database exists, then publish the rules with
+1. Firebase (project `family-packing-ba2c3`, already in `.firebaserc`): the
+   Firestore database has **not been created** (the console's location picker
+   would not open on Amin's phone). Create it first:
+   `firebase firestore:databases:create "(default)" --location northamerica-northeast2`
+   (Standard edition; check `firebase firestore:databases:list` first in case
+   he created it by hand since). Then publish the rules with
    `firebase deploy --only firestore:rules` (or paste `firestore.rules` into
    the console's Rules tab). Then test sync between two browsers.
 2. `npm install`, then `npx eas-cli init` (Expo account `ddduber`) to create
