@@ -200,15 +200,9 @@ export default function ListScreen({ listId, members, trip, onBack }) {
         {!!(opts.sub || i.note) && <Text style={row.note}>{opts.sub || i.note}</Text>}
       </TouchableOpacity>
       <QtyBox value={i.qty || 1} onChange={(v) => set(i.id, { qty: v })} label={"Quantity for " + i.name} />
-      {opts.flat ? (
-        <TouchableOpacity onPress={() => removeItem(i)} style={row.icon} accessibilityLabel={"Remove " + i.name} accessibilityRole="button">
-          <Text style={{ fontSize: 22, color: colors.inkSoft }}>×</Text>
-        </TouchableOpacity>
-      ) : (
-        <TouchableOpacity onPress={() => setMenu({ kind: "item", id: i.id })} style={row.icon} accessibilityLabel={"Options for " + i.name} accessibilityRole="button">
-          <Text style={{ fontSize: 20, color: colors.primary, fontWeight: "800" }}>⋯</Text>
-        </TouchableOpacity>
-      )}
+      <TouchableOpacity onPress={() => setMenu({ kind: "item", id: i.id })} style={row.icon} accessibilityLabel={"Options for " + i.name} accessibilityRole="button">
+        <Text style={{ fontSize: 20, color: colors.primary, fontWeight: "800" }}>⋯</Text>
+      </TouchableOpacity>
     </View>
   );
 
@@ -355,16 +349,22 @@ export default function ListScreen({ listId, members, trip, onBack }) {
                 setMenu({ kind: "edit", id: menuItem.id });
               }}
             />
-            <SheetRow label="Move to another section" onPress={() => setMenu({ kind: "move", id: menuItem.id })} />
-            <View style={{ flexDirection: "row" }}>
-              <View style={{ flex: 1, marginRight: 4 }}>
-                <SheetRow label="Move up ↑" disabled={sortAZ} onPress={() => nudge(menuItem, -1)} />
+            <SheetRow
+              label="Move to another section"
+              sub={"Now in " + ((sections.find((s) => s.id === homeOf(menuItem)) || {}).title || "no section")}
+              onPress={() => setMenu({ kind: "move", id: menuItem.id })}
+            />
+            {!flat && (
+              <View style={{ flexDirection: "row" }}>
+                <View style={{ flex: 1, marginRight: 4 }}>
+                  <SheetRow label="Move up ↑" disabled={sortAZ} onPress={() => nudge(menuItem, -1)} />
+                </View>
+                <View style={{ flex: 1, marginLeft: 4 }}>
+                  <SheetRow label="Move down ↓" disabled={sortAZ} onPress={() => nudge(menuItem, 1)} />
+                </View>
               </View>
-              <View style={{ flex: 1, marginLeft: 4 }}>
-                <SheetRow label="Move down ↓" disabled={sortAZ} onPress={() => nudge(menuItem, 1)} />
-              </View>
-            </View>
-            {sortAZ && <Text style={[ui.sub, { marginTop: 6 }]}>Switch back to “My order” to rearrange items.</Text>}
+            )}
+            {!flat && sortAZ && <Text style={[ui.sub, { marginTop: 6 }]}>Switch back to “My order” to rearrange items.</Text>}
             <SheetRow
               label="Remove"
               danger
