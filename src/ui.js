@@ -13,10 +13,41 @@ import {
 } from "react-native";
 import { colors, fonts, radius } from "./theme";
 
-// Web-safe confirm dialog (Alert.alert is a no-op in browsers).
+// Web-safe confirm dialog. Alert.alert is a no-op in browsers, and some
+// embedded browsers silently block window.confirm, so the web shows its own
+// dialog through <ConfirmHost /> (mounted once in App.js).
+let showConfirm = null;
+export function ConfirmHost() {
+  const [ask, setAsk] = useState(null);
+  useEffect(() => {
+    showConfirm = setAsk;
+    return () => {
+      showConfirm = null;
+    };
+  }, []);
+  const close = () => setAsk(null);
+  return (
+    <Sheet visible={!!ask} onClose={close} title={ask ? ask.title : ""}>
+      {ask && !!ask.msg && <Text style={{ fontSize: fonts.body, color: colors.inkSoft, marginBottom: 6 }}>{ask.msg}</Text>}
+      {ask && (
+        <SheetRow
+          label={ask.confirmLabel}
+          danger
+          onPress={() => {
+            const go = ask.onConfirm;
+            close();
+            go();
+          }}
+        />
+      )}
+      <SheetRow label="Cancel" onPress={close} />
+    </Sheet>
+  );
+}
+
 export function confirmAction(title, msg, confirmLabel, onConfirm) {
   if (Platform.OS === "web") {
-    if (typeof window !== "undefined" && window.confirm(msg ? `${title}\n${msg}` : title)) onConfirm();
+    if (showConfirm) showConfirm({ title, msg, confirmLabel: confirmLabel || "OK", onConfirm });
   } else {
     Alert.alert(title, msg, [
       { text: "Cancel", style: "cancel" },

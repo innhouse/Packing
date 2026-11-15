@@ -101,7 +101,7 @@ export const WINTER_EUROPE = [
   ]],
   ["Packing day", [
     ["Split essentials across both checked bags"],
-    ["Weigh the bags", "Cabin 10 kg each; checked 20 kg and 23 kg"],
+    ["Weigh the bags", "Cabin 10 kg each; checked 20 kg each"],
   ]],
 ];
 

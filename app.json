@@ -22,6 +22,14 @@
     "owner": "ddduber",
     "runtimeVersion": {
       "policy": "sdkVersion"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "86696b7d-edd7-40c7-a451-6c9b3c702d04"
+      }
+    },
+    "updates": {
+      "url": "https://u.expo.dev/86696b7d-edd7-40c7-a451-6c9b3c702d04"
     }
   }
 }

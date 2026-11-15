@@ -327,6 +327,20 @@ export default function ListScreen({ listId, members, trip, onBack }) {
         {store.mode === "local" && (
           <Text style={[ui.sub, { textAlign: "center", marginTop: 16 }]}>Saved on this device only.</Text>
         )}
+        {!flat && !q && (
+          <Btn
+            label="Remove this list"
+            kind="danger"
+            small
+            style={{ alignSelf: "flex-start", marginTop: 30 }}
+            onPress={() =>
+              confirmAction("Remove this list?", "The list will be hidden for everyone.", "Remove", () => {
+                store.updateList(listId, { hidden: true });
+                onBack();
+              })
+            }
+          />
+        )}
       </ScrollView>
 
       {/* Item menu */}

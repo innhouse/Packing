@@ -5,7 +5,7 @@ import * as Updates from "expo-updates";
 import { store } from "./src/store";
 import { TRIP_SEED } from "./src/template";
 import { colors, fonts } from "./src/theme";
-import { ui } from "./src/ui";
+import { ui, ConfirmHost } from "./src/ui";
 import WhoScreen from "./src/screens/WhoScreen";
 import TripsScreen from "./src/screens/TripsScreen";
 import TripScreen from "./src/screens/TripScreen";
@@ -143,6 +143,7 @@ export default function App() {
     <View style={[ui.screen, { paddingTop: TOP }]}>
       <StatusBar barStyle="dark-content" />
       {body}
+      {Platform.OS === "web" && <ConfirmHost />}
     </View>
   );
 }
