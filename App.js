@@ -6,6 +6,8 @@ import { store } from "./src/store";
 import { TRIP_SEED } from "./src/template";
 import { colors, fonts } from "./src/theme";
 import { ui, ConfirmHost } from "./src/ui";
+import { watchSignedIn } from "./src/auth";
+import PasscodeScreen from "./src/screens/PasscodeScreen";
 import WhoScreen from "./src/screens/WhoScreen";
 import TripsScreen from "./src/screens/TripsScreen";
 import TripScreen from "./src/screens/TripScreen";
@@ -15,19 +17,11 @@ import ListScreen from "./src/screens/ListScreen";
 const ME_KEY = "familypacking.memberId";
 const TOP = Platform.OS === "ios" ? 58 : Platform.OS === "android" ? 36 : 18;
 
+// The family passcode comes first: nothing is read from the database until
+// this device has signed in with it (see src/auth.js and firestore.rules).
 export default function App() {
-  const [screen, setScreen] = useState("trips"); // who | trips | trip | newlist | list
-  const [meId, setMeId] = useState(undefined); // undefined = not read yet
-  const [members, setMembers] = useState(null);
-  const [trips, setTrips] = useState(null);
-  const [lists, setLists] = useState(null);
-  const [tripId, setTripId] = useState(null);
-  const [listId, setListId] = useState(null);
-  const [slow, setSlow] = useState(false);
-  useEffect(() => {
-    const t = setTimeout(() => setSlow(true), 7000);
-    return () => clearTimeout(t);
-  }, []);
+  const [signedIn, setSignedIn] = useState(undefined); // undefined = not known yet
+  useEffect(() => watchSignedIn(setSignedIn), []);
 
   // Apply over-the-air updates on launch instead of on the next launch.
   useEffect(() => {
@@ -43,6 +37,35 @@ export default function App() {
         // offline or no update: carry on with what we have
       }
     })();
+  }, []);
+
+  if (signedIn) return <Main />;
+  return (
+    <View style={[ui.screen, { paddingTop: TOP }]}>
+      <StatusBar barStyle="dark-content" />
+      {signedIn === false ? (
+        <PasscodeScreen />
+      ) : (
+        <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+          <Text style={{ fontSize: fonts.big, color: colors.inkSoft }}>Loading…</Text>
+        </View>
+      )}
+    </View>
+  );
+}
+
+function Main() {
+  const [screen, setScreen] = useState("trips"); // who | trips | trip | newlist | list
+  const [meId, setMeId] = useState(undefined); // undefined = not read yet
+  const [members, setMembers] = useState(null);
+  const [trips, setTrips] = useState(null);
+  const [lists, setLists] = useState(null);
+  const [tripId, setTripId] = useState(null);
+  const [listId, setListId] = useState(null);
+  const [slow, setSlow] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setSlow(true), 7000);
+    return () => clearTimeout(t);
   }, []);
 
   useEffect(() => store.subMembers((m) => setMembers(m.slice().sort((a, b) => a.name.localeCompare(b.name)))), []);

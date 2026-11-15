@@ -1,14 +1,18 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Family-trial rules, same trade-off as Family Rides: anyone with the
-    // app's Firebase config can read and write. Fine for packing lists;
-    // tighten with Firebase Auth before any wider use.
-    match /members/{id} { allow read, write: if true; }
-    match /trips/{id} { allow read, write: if true; }
+    // Only the shared family account gets in. Its password is the family
+    // passcode (set with `node scripts/set-passcode.js`); the app signs in
+    // with it once per device (src/auth.js). Anyone else, including other
+    // accounts someone might create in this project, is refused.
+    function family() {
+      return request.auth != null && request.auth.uid == "992tpNAgW4aBqSjkwV699Ssdv2a2";
+    }
+    match /members/{id} { allow read, write: if family(); }
+    match /trips/{id} { allow read, write: if family(); }
     match /lists/{id} {
-      allow read, write: if true;
-      match /items/{itemId} { allow read, write: if true; }
+      allow read, write: if family();
+      match /items/{itemId} { allow read, write: if family(); }
     }
   }
 }

@@ -24,6 +24,16 @@ ship them without asking for terminal work unless unavoidable.
   including its removed items.
 
 ## What it does
+- **Family passcode** (added 2026-11-15, Amin's call): the first screen on a
+  new device asks for it; the device then remembers it. It is the password of
+  one shared Firebase Auth account (`family@family-packing.example`, see
+  `src/auth.js` / `auth.web.js`), and `firestore.rules` only admits that
+  account's uid, so the database refuses everyone else. Only Amin knows the
+  passcode; it is not stored in the project. To change it, Amin runs
+  `node scripts/set-passcode.js` in a terminal (the uid stays the same, so no
+  rules change). Email/password sign-in is enabled via `firebase.json`
+  (`firebase deploy --only auth`). Phone sign-in persistence has not yet been
+  checked on a real iPhone.
 - **Who**: pick your name once per device (no PINs). Anyone can add family members.
 - **Trips** → **lists** (one per person, plus optional "Shared" lists).
 - **List screen**: sections with items; tick, quantity, add, edit name/note,
