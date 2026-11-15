@@ -8,16 +8,20 @@ iPhone through TestFlight, Firebase Firestore behind it.
 The owner (Amin) is not a developer. Explain changes in plain language and
 ship them without asking for terminal work unless unavoidable.
 
-## Status (2026-11-13)
-- App code written and tested **on web only** (`npx expo export --platform web`,
-  then clicked through every feature in a browser). **Never yet run on a phone.**
-- Firebase project `family-packing-ba2c3` is wired into `firebaseConfig.js`,
-  so the app is in **cloud mode**. **Sync has never been tested**: the build
-  sandbox could not reach Firestore. Before first use, **create the Firestore
-  database** (see First deploy step 1) and **publish `firestore.rules`**
-  (`firebase deploy --only firestore:rules`); until then every read is denied
-  and the app sits on "Loading…".
-- Not yet deployed anywhere. See "First deploy" below.
+## Status (2026-11-15)
+- **First deploy done.** Firestore database created (northamerica-northeast2,
+  Standard) and `firestore.rules` published. Web is live at
+  https://family-packing.expo.app. EAS project `@ddduber/family-packing`.
+- **iPhone**: build 3 submitted to TestFlight 2026-11-15, App Store Connect
+  app id `6835168315` (listing name "Family Packing (da7c75)" because the
+  plain name was taken; the home-screen name is still Family Packing).
+  Internal group "Team (Expo)". **Expires ~2027-02-13; rebuild + resubmit
+  before then.** Not yet opened on a phone.
+- Reading and writing Firestore works from the web. Live sync between two
+  devices has not been deliberately tested yet.
+- Amin's list for the Malta trip was imported from the old web checklist
+  (Claude artifact "Packing Checklist: Malta, Sicily, Naples & Budapest"),
+  including its removed items.
 
 ## What it does
 - **Who**: pick your name once per device (no PINs). Anyone can add family members.
@@ -56,7 +60,9 @@ offline on the phone sync only if the app stays open until it reconnects.
   native gesture libraries that could not be tested. Amin liked dragging in
   the web checklist; add it once the app runs on a phone.
 
-## First deploy (needs Amin's sign-ins; he types passwords)
+## First deploy (DONE 2026-11-15; kept for reference. Steps 4–6 are the routine ones)
+Apple sign-in for builds/submits must run in an interactive terminal; if the
+"Get Verification Code" route fails, choose **sms** for the six-digit code.
 1. Firebase (project `family-packing-ba2c3`, already in `.firebaserc`): the
    Firestore database has **not been created** (the console's location picker
    would not open on Amin's phone). Create it first:
@@ -82,3 +88,8 @@ offline on the phone sync only if the app stays open until it reconnects.
 ## Gotchas inherited from Family Rides
 - Never touch `window.*` outside `Platform.OS === "web"`.
 - `Alert.alert` does nothing on web; use `confirmAction` in `src/ui.js`.
+- `window.confirm` is silently blocked in some embedded browsers (the Claude
+  desktop browser pane), so on web `confirmAction` shows its own dialog via
+  `<ConfirmHost />` in `App.js`. Don't go back to `window.confirm`.
+- Lists can be hidden from the list screen ("Remove this list"); there is no
+  in-app way to un-hide one (set `hidden: false` on the `lists` doc).
