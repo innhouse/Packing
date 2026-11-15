@@ -22,6 +22,8 @@ export default function ListScreen({ listId, members, trip, onBack }) {
   const [newSection, setNewSection] = useState("");
   const [clearArmed, setClearArmed] = useState(false);
   const clearTimer = useRef(null);
+  const scroller = useRef(null);
+  const sectionY = useRef({}); // section id -> distance from the top of the list
 
   useEffect(() => store.subList(listId, (l) => setList(l)), [listId]);
   useEffect(
@@ -188,6 +190,19 @@ export default function ListScreen({ listId, members, trip, onBack }) {
   };
 
   const close = () => setMenu(null);
+  const jumpTo = (sid) => {
+    if (collapsed[sid]) {
+      const next = { ...collapsed, [sid]: false };
+      setCollapsed(next);
+      saveView({ collapsed: next });
+    }
+    close();
+    // Wait for the sheet to close before scrolling.
+    setTimeout(() => {
+      const y = sectionY.current[sid];
+      if (scroller.current && y != null) scroller.current.scrollTo({ y: Math.max(0, y - 6), animated: true });
+    }, 60);
+  };
   const menuItem = menu && menu.id ? (items || []).find((i) => i.id === menu.id) : null;
   const menuSection = menu && menu.sid ? sections.find((s) => s.id === menu.sid) : null;
 
@@ -242,6 +257,7 @@ export default function ListScreen({ listId, members, trip, onBack }) {
             }}
           />
           {!flat && <Pill label={anyOpen ? "Collapse" : "Expand"} onPress={collapseAll} />}
+          {!flat && sections.length > 1 && <Pill label="Jump to…" onPress={() => setMenu({ kind: "jump" })} />}
           <Pill label={clearArmed ? "Tap again to clear" : "Clear ticks"} on={clearArmed} onPress={clearTicks} />
         </View>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -262,7 +278,7 @@ export default function ListScreen({ listId, members, trip, onBack }) {
         </View>
       </View>
 
-      <ScrollView contentContainerStyle={[ui.body, { paddingTop: 12, paddingBottom: 80 }]} keyboardShouldPersistTaps="handled">
+      <ScrollView ref={scroller} contentContainerStyle={[ui.body, { paddingTop: 12, paddingBottom: 80 }]} keyboardShouldPersistTaps="handled">
         {nothing && <Text style={{ textAlign: "center", color: colors.inkSoft, padding: 24 }}>No items match.</Text>}
 
         {flat ? (
@@ -273,7 +289,7 @@ export default function ListScreen({ listId, members, trip, onBack }) {
             const d = all.filter((i) => i.checked).length;
             const open = q ? true : !collapsed[s.id];
             return (
-              <View key={s.id} style={ui.card}>
+              <View key={s.id} style={ui.card} onLayout={(e) => (sectionY.current[s.id] = e.nativeEvent.layout.y)}>
                 <View style={[row.head, !open && { borderBottomWidth: 0 }]}>
                   <TouchableOpacity style={{ flex: 1, flexDirection: "row", alignItems: "center" }} onPress={() => toggleCollapse(s.id)} accessibilityRole="button" accessibilityLabel={(open ? "Collapse " : "Expand ") + s.title}>
                     <Text style={{ width: 20, color: colors.inkSoft, fontSize: fonts.small }}>{open ? "▾" : "▸"}</Text>
@@ -376,6 +392,16 @@ export default function ListScreen({ listId, members, trip, onBack }) {
             <Btn label="Done" kind="ghost" onPress={close} style={{ marginTop: 12 }} />
           </View>
         )}
+      </Sheet>
+
+      {/* Jump to a section */}
+      <Sheet visible={!!menu && menu.kind === "jump"} onClose={close} title="Jump to…">
+        <ScrollView style={{ maxHeight: 420 }}>
+          {shownSections.map(({ s }) => {
+            const all = live.filter((i) => homeOf(i) === s.id);
+            return <SheetRow key={s.id} label={s.title} sub={all.filter((i) => i.checked).length + " of " + all.length + " packed"} onPress={() => jumpTo(s.id)} />;
+          })}
+        </ScrollView>
       </Sheet>
 
       {/* Move to section */}
