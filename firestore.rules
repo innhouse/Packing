@@ -6,7 +6,7 @@ service cloud.firestore {
     // with it once per device (src/auth.js). Anyone else, including other
     // accounts someone might create in this project, is refused.
     function family() {
-      return request.auth != null && request.auth.uid == "992tpNAgW4aBqSjkwV699Ssdv2a2";
+      return request.auth != null && request.auth.uid == "cQhWzuNJqENzGyoZsIMuqA5EUis2";
     }
     match /members/{id} { allow read, write: if family(); }
     match /trips/{id} { allow read, write: if family(); }
